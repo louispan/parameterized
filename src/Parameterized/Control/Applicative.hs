@@ -6,8 +6,9 @@
 
 module Parameterized.Control.Applicative
     ( module Parameterized.Type
-    , module Parameterized.Control.Pointed
     , module Parameterized.Data.Functor
+    , PPointed(..)
+    , ppure
     , PApplicative(..)
     , papply
     , (&<*>)
@@ -25,8 +26,17 @@ module Parameterized.Control.Applicative
 
 import Data.Kind
 import Parameterized.Type
-import Parameterized.Control.Pointed
 import Parameterized.Data.Functor
+
+-- | Parameterized version of 'pure' in 'Applicative'
+-- An instance of this should create a parameterized unary type
+-- where the parameter is an identity in respect to 'Parameterized.Data.Applicative.papply''
+class PPointed (m :: k -> Type -> Type) where
+    ppure' :: a -> m (PId m) a
+
+-- | Allow you to call 'ppure'' on any type as long as it is an instance of 'IsPUnary'
+ppure :: (IsPUnary x m (PId m), PPointed m) => a -> x a
+ppure = fromPUnary . ppure'
 
 -- | Parameterized version of 'ap' in 'Applicative'
 class (Functor (m t), Functor (m u), Functor (m v), PPointed m) =>
@@ -93,7 +103,6 @@ class PApplicative m t u v =>
       PAlternative (m :: k -> Type -> Type) (t :: k) (u :: k) (v :: k) | t u -> v where
     -- | An associative binary operation
     pappend' :: m t a -> m u a -> m v a
-
 
 -- | Allow you to call 'pappend'' on any type as long as it is an instance of 'IsPNullary'
 pappend

@@ -23,8 +23,10 @@ library
                        Parameterized.Data.Monoid
                        Parameterized.Control.Applicative
                        Parameterized.Control.Monad
-                       Parameterized.Control.Pointed
+                       Parameterized.Control.Monad.Trans.Reader
   build-depends:       base >= 4.7 && < 5
+                     , data-diverse >= 1.2.0.2
+                     , transformers >= 0.5.2.0
   ghc-options:         -Wall
   default-language:    Haskell2010
 

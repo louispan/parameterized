@@ -11,21 +11,30 @@ import Data.Kind
 -- | Turns a parameter that is an identity.
 type family PId (m :: k1) :: k2
 
+
 -- | Converts a type to/from a "parameterized" type which is a monotype
 -- after application of the "parameter" kind argument (eg. Monoid, Semigroup)
--- Note: the functional dependencies to be injective both directions will help type inference.
+-- This is useful when there is only one meaningful parameterized version of a type,
+-- but that type may not have the type arguments in the correct order.
+-- This class enables calling "parameterized" combinators on those those types.
+-- Note: the functional dependencies are injective both directions to help type inference.
 class IsPNullary (x :: Type) (n :: k -> Type) (t :: k) | x -> n t, n t -> x where
     toPNullary :: x -> n t
     fromPNullary :: n t -> x
 
 -- | Converts a type to/from a "parameterized" type which accepts one type argument,
 -- after application of the "parameter" kind argument (eg. Functor, Monad)
--- Note: the functional dependencies to be injective both directions will help type inference.
+-- This is useful when there is only one meaningful parameterized version of a type,
+-- but that type may not have the type arguments in the correct order.
+-- This class enables calling "parameterized" combinators on those those types.
+-- Note: the functional dependencies are injective both directions to help type inference.
 class IsPUnary x (m :: k -> Type -> Type) (t :: k) | x -> m t, m t -> x where
     toPUnary :: x a -> m t a
     fromPUnary :: m t a -> x a
 
 -- | Get the first type of a type level tuple
+-- This is useful for defining a newtype wrapper with a single "parameterized" type,
+-- around a type with many "parameterized" type variables.
 type family At0 t where
     At0 (x, _) = x
     At0 (x, _, _) = x
