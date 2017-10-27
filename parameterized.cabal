@@ -17,8 +17,7 @@ tested-with:         GHC == 8.0.2, GHC == 8.2.1
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Parameterized.Type
-                       Parameterized.Data.Functor
+  exposed-modules:     Parameterized.TypeLevel
                        Parameterized.Data.Semigroup
                        Parameterized.Data.Monoid
                        Parameterized.Control.Applicative

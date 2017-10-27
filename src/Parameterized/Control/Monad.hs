@@ -7,7 +7,6 @@
 module Parameterized.Control.Monad
     ( module Parameterized.Control.Applicative
     , PMonad(..)
-    , pbind
     , (&>>=)
     , (&>>)
     , (&=<<)
@@ -17,46 +16,35 @@ module Parameterized.Control.Monad
     ) where
 
 import Data.Kind
-import Parameterized.Type
+import Parameterized.TypeLevel
 import Parameterized.Control.Applicative
 
 -- | Parameterized version of Monad.
 class PApplicative m t u v => PMonad (m :: k -> Type -> Type) (t :: k) (u :: k) (v :: k) where
-    pbind' :: m t a -> (a -> m u b) -> m v b
+    -- | Sequentially compose two actions, passing any value produced by the first as an argument to the second.
+    pbind :: m t a -> (a -> m u b) -> m v b
 
--- | Allow you to call 'pbind'' on any type as long as it is an instance of 'IsPUnary'
-pbind
-    :: (IsPUnary x m t, IsPUnary y m u, IsPUnary z m v, PMonad m t u v)
-    => x a -> (a -> y b) -> z b
-pbind x k = fromPUnary (toPUnary x `pbind'` (toPUnary . k))
-
-(&>>=)
-    :: (IsPUnary x m t, IsPUnary y m u, IsPUnary z m v, PMonad m t u v)
-    => x a -> (a -> y b) -> z b
+-- | Sequentially compose two actions, passing any value produced by the first as an argument to the second.
+(&>>=) :: PMonad m t u v => m t a -> (a -> m u b) -> m v b
 (&>>=) = pbind
 infixl 1 &>>=
 
-(&>>)
-    :: (IsPUnary x m t, IsPUnary y m u, IsPUnary z m v, PMonad m t u v)
-    => x a -> y b -> z b
+(&>>) :: PMonad m t u v => m t a -> m u b -> m v b
 m &>> k = m &>>= \_ -> k
 infixl 1 &>>
 
 -- | Same as '&>>=', but with the arguments interchanged.
-(&=<<) :: (IsPUnary x m t, IsPUnary y m u, IsPUnary z m v, PMonad m t u v) => (a -> y b) -> x a -> z b
+(&=<<) :: PMonad m t u v => (a -> m u b) -> m t a -> m v b
 f &=<< x = x &>>= f
 infixr 1 &=<<
 
 -- | Left-to-right Kleisli composition of monads.
-(&>=>)
-    :: (IsPUnary x m t, IsPUnary y m u, IsPUnary z m v, PMonad m t u v)
-    => (a -> x b) -> (b -> y c) -> (a -> z c)
+(&>=>) :: (PMonad m t u v) => (a -> m t b) -> (b -> m u c) -> (a -> m v c)
 f &>=> g = \x -> f x &>>= g
 infixr 1 &>=>
 
 -- | Right-to-left Kleisli composition of monads. @('>=>')@, with the arguments flipped.
-(&<=<) :: (IsPUnary x m t, IsPUnary y m u, IsPUnary z m v, PMonad m t u v)
-    => (b -> y c) -> (a -> x b) -> (a -> z c)
+(&<=<) :: (PMonad m t u v) => (b -> m u c) -> (a -> m t b) -> (a -> m v c)
 (&<=<) = flip (&>=>)
 infixr 1 &<=<
 

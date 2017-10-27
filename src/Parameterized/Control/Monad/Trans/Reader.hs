@@ -24,16 +24,10 @@ instance Applicative m => Applicative (ReaderChoice m r) where
 instance Monad m => Monad (ReaderChoice m r) where
     (ReaderChoice x) >>= k = ReaderChoice $ x >>= runReaderChoice . k
 
--- | Since ReaderT has different flavours of parameterized monads,
--- ReaderChoice should only be IsPUnary with itself.
-instance IsPUnary (ReaderChoice m r) (ReaderChoice m) r where
-    toPUnary = id
-    fromPUnary = id
-
 type instance PId ReaderChoice = Which '[]
 
 instance Applicative m => PPointed (ReaderChoice m) where
-    ppure' = pure
+    ppure = pure
 
 -- -- | Given a Reader that can read @Which a@, and another Reader that can read @Which b@
 -- -- make a reader that can reader either @Which a@ or @Which b@
