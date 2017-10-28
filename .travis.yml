@@ -45,7 +45,7 @@ install:
  - cabal --version
  - echo "$(${HC} --version) [$(${HC} --print-project-git-commit-id 2> /dev/null || echo '?')]"
  - BENCH=${BENCH---enable-benchmarks}
- - TEST=${TEST---enable-tests}
+ # - TEST=${TEST---enable-tests}
  - HADDOCK=${HADDOCK-true}
  - INSTALLED=${INSTALLED-true}
  - travis_retry cabal update -v
