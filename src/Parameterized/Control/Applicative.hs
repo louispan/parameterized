@@ -24,7 +24,10 @@ import Parameterized.TypeLevel
 
 -- | Parameterized version of 'pure' in 'Applicative'
 -- An instance of this should create a parameterized unary type
--- where the parameter is an identity in respect to 'Parameterized.Data.Applicative.papply''
+-- where the parameter is an identity in respect to 'papply' and 'pappend'
+-- That is, there are additional parameterized laws:
+-- the parameter of @pure a `pappend` m t a@ = t
+-- the parameter of @m t a `papply` pempty@ = t
 class PPointed (m :: k -> Type -> Type) where
     -- | lift a value.
     ppure :: a -> m (PId m) a
@@ -68,13 +71,19 @@ pliftA3
 pliftA3 f a b c = pliftA2 f a b &<*> c
 
 -- | Parameterized version of empty in 'Alternative'.
+-- An instance of this should create a parameterized unary type
+-- where the parameter is an identity in respect to 'pappend' and 'papply'
+-- That is, there are additional parameterized laws:
+-- the parameter of @pure a `pappend` m t a@ = t
+-- the parameter of @m t a `papply` pempty@ = t
 class PEmpty (m :: k -> Type -> Type) where
     -- | The identity of '&<|>'
     pempty :: m (PId m) a
 
 -- | Parameterized version of 'Alternative'
-class PApplicative m t u v =>
-      PAlternative (m :: k -> Type -> Type) (t :: k) (u :: k) (v :: k) | t u -> v where
+-- NB. PAlternative doensn't require 'PApplicative' as a superclass, because
+-- Some things can be made instances of 'PAlternative' but not 'PApplicative'.
+class PAlternative (m :: k -> Type -> Type) (t :: k) (u :: k) (v :: k) | t u -> v where
     -- | An associative binary operation
     pappend :: m t a -> m u a -> m v a
 
