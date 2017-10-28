@@ -6,4 +6,5 @@ Parameterized/indexed monoids and monads using only a single parameter type vari
 # Changelog
 
 * 0.1.0.0
-  - Initial version
+  - Initial version with parameterized Semigroup, Monoid, Applicative, Alternative, Monad
+  - Added instances for OverlappingWhichReader, DistinctWhichReader, ManyReader, ManyState, and ChangingState
