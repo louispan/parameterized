@@ -6,9 +6,6 @@
 
 module Parameterized.TypeLevel where
 
--- | Returns a parameter that is an identity.
-type family PId (m :: k1) :: k2
-
 -- | Get the first type of a type level tuple
 -- This is useful for defining a newtype wrapper with a single "parameterized" type,
 -- around a type with many "parameterized" type variables.

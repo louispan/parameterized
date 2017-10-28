@@ -24,16 +24,14 @@ import Parameterized.TypeLevel
 
 -- | Parameterized version of 'pure' in 'Applicative'
 -- An instance of this should create a parameterized unary type
--- where the parameter is an identity in respect to 'papply' and 'pappend'
--- That is, there are additional parameterized laws:
--- the parameter of @pure a `pappend` m t a@ = t
--- the parameter of @m t a `papply` pempty@ = t
-class PPointed (m :: k -> Type -> Type) where
+-- where the parameter is an identity in respect to 'papply'
+class PPointed (m :: k -> Type -> Type) (id :: k) where
     -- | lift a value.
-    ppure :: a -> m (PId m) a
+    ppure :: a -> m id a
 
 -- | Parameterized version of 'ap' in 'Applicative'
-class (Functor (m t), Functor (m u), Functor (m v), PPointed m) =>
+-- NB. 'PPointed' cannot be made a superclass because type variable @id@ is not in scope.
+class (Functor (m t), Functor (m u), Functor (m v)) =>
       PApplicative (m :: k -> Type -> Type) (t :: k) (u :: k) (v :: k) | t u -> v where
     -- | Sequential application.
     papply :: m t (a -> b) -> m u a -> m v b
@@ -55,8 +53,8 @@ infixl 4 &<*
 infixl 4 &*> -- , &<**>
 
 -- | Lift a function to actions.
-pliftA :: (PApplicative m (PId m) t t) => (a -> b) -> m t a -> m t b
-pliftA f x = ppure f `papply` x
+pliftA :: (Functor (m t)) => (a -> b) -> m t a -> m t b
+pliftA f x = f <$> x
 
 -- | Lift a binary function to actions.
 pliftA2 :: (PApplicative m t u v) => (a -> b -> c) -> m t a -> m u b -> m v c
@@ -72,15 +70,13 @@ pliftA3 f a b c = pliftA2 f a b &<*> c
 
 -- | Parameterized version of empty in 'Alternative'.
 -- An instance of this should create a parameterized unary type
--- where the parameter is an identity in respect to 'pappend' and 'papply'
--- That is, there are additional parameterized laws:
--- the parameter of @pure a `pappend` m t a@ = t
--- the parameter of @m t a `papply` pempty@ = t
-class PEmpty (m :: k -> Type -> Type) where
+-- where the parameter is an identity in respect to 'pappend'
+class PEmpty (m :: k -> Type -> Type) (id :: k) where
     -- | The identity of '&<|>'
-    pempty :: m (PId m) a
+    pempty :: m id a
 
 -- | Parameterized version of 'Alternative'
+-- NB. 'PEmpty' cannot be made a superclass because type variable @id@ will be ambiguous.
 -- NB. PAlternative doensn't require 'PApplicative' as a superclass, because
 -- Some things can be made instances of 'PAlternative' but not 'PApplicative'.
 class PAlternative (m :: k -> Type -> Type) (t :: k) (u :: k) (v :: k) | t u -> v where

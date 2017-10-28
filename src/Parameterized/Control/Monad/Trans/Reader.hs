@@ -21,6 +21,10 @@ import Data.Diverse
 import qualified GHC.Generics as G
 import Parameterized.Control.Monad
 
+-- | Given a Reader that accepts @Which a@, and another Reader that accepts @Which b@
+-- make a reader that accepts @Which (AppendUnique a b)@ and runs both readers if possible,
+-- where the types in @Which a@ and @Which b@ may overlap,
+-- but with the compile time constraint that all the types in (AppendUnique a b) are distinct.
 newtype OverlappingWhichReader m r a = OverlappingWhichReader
     { runOverlappingWhichReader :: ReaderT r m a
     } deriving ( G.Generic
@@ -35,18 +39,12 @@ newtype OverlappingWhichReader m r a = OverlappingWhichReader
                , MonadIO
                )
 
-type instance PId (OverlappingWhichReader m) = Which '[]
-
-instance Applicative m => PPointed (OverlappingWhichReader m) where
+instance Applicative m => PPointed (OverlappingWhichReader m) (Which '[]) where
     ppure = OverlappingWhichReader . pure
 
-instance Alternative m => PEmpty (OverlappingWhichReader m) where
+instance Alternative m => PEmpty (OverlappingWhichReader m) (Which '[]) where
     pempty = OverlappingWhichReader $ empty
 
--- | Given a Reader that accepts @Which a@, and another Reader that accepts @Which b@
--- make a reader that accepts @Which (AppendUnique a b)@ and runs both readers if possible,
--- where the types in @Which a@ and @Which b@ may overlap,
--- but with the compile time constraint that all the types in (AppendUnique a b) are distinct.
 instance ( Alternative m
          , Reinterpret b c
          , Reinterpret a c
@@ -62,6 +60,9 @@ instance ( Alternative m
 
 -------------------------------
 
+-- | Given a Reader that accepts @Which a@, and another Reader that accepts @Which b@
+-- make a reader that accepts @Which (Append a b)@ and only run one of the readers for the correct Which type,
+-- with a compile-time contraint that the types in @Which a@ are distinct from the type in @Which b@
 newtype DistinctWhichReader m r a = DistinctWhichReader
     { runDistinctWhichReader :: ReaderT r m a
     } deriving ( G.Generic
@@ -76,17 +77,12 @@ newtype DistinctWhichReader m r a = DistinctWhichReader
                , MonadIO
                )
 
-type instance PId (DistinctWhichReader m) = Which '[]
-
-instance Applicative m => PPointed (DistinctWhichReader m) where
+instance Applicative m => PPointed (DistinctWhichReader m) (Which '[]) where
     ppure = DistinctWhichReader . pure
 
-instance Alternative m => PEmpty (DistinctWhichReader m) where
+instance Alternative m => PEmpty (DistinctWhichReader m) (Which '[]) where
     pempty = DistinctWhichReader $ empty
 
--- | Given a Reader that accepts @Which a@, and another Reader that accepts @Which b@
--- make a reader that accepts @Which (Append a b)@ and only run one of the readers for the correct Which type,
--- with a compile-time contraint that the types in @Which a@ are distinct from the type in @Which b@
 instance ( Reinterpret b c
          , Complement c b ~ a
          , Complement c a ~ b
@@ -100,6 +96,9 @@ instance ( Reinterpret b c
 
 -------------------------------
 
+-- | Given a Reader that accepts @Many a@, and another Reader that accepts @Many b@
+-- make a reader that accepts @Many (AppendUnique a b)@
+-- with the compile time constraint that all the types in (AppendUnique a b) are distinct.
 newtype ManyReader m r a = ManyReader
     { runManyReader :: ReaderT r m a
     } deriving ( G.Generic
@@ -114,14 +113,12 @@ newtype ManyReader m r a = ManyReader
                , MonadIO
                )
 
-type instance PId (ManyReader m) = Many '[]
-
-instance Applicative m => PPointed (ManyReader m) where
+instance Applicative m => PPointed (ManyReader m) (Many '[]) where
     ppure = ManyReader . pure
 
--- | Given a Reader that accepts @Many a@, and another Reader that accepts @Many b@
--- make a reader that accepts @Many (AppendUnique a b)@
--- with the compile time constraint that all the types in (AppendUnique a b) are distinct.
+instance Alternative m => PEmpty (ManyReader m) (Many '[]) where
+    pempty = ManyReader $ empty
+
 instance ( Functor (ManyReader m (Many c))
          , Applicative m
          , Select a c
@@ -131,9 +128,6 @@ instance ( Functor (ManyReader m (Many c))
          PApplicative (ManyReader m) (Many a) (Many b) (Many c) where
     papply (ManyReader (ReaderT f)) (ManyReader (ReaderT g)) =
         ManyReader . ReaderT $ \c -> f (select c) <*> g (select c)
-
-instance Alternative m => PEmpty (ManyReader m) where
-    pempty = ManyReader $ empty
 
 instance ( Functor (ManyReader m (Many c))
          , Alternative m

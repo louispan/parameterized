@@ -21,6 +21,9 @@ import Data.Diverse
 import qualified GHC.Generics as G
 import Parameterized.Control.Monad
 
+-- | Given a ManyState that modifies @Many a@, and another ManyState that modifes @Many b@
+-- make a State that accepts @Many (AppendUnique a b)@
+-- with the compile time constraint that all the types in (AppendUnique a b) are distinct.
 newtype ManyState m s a = ManyState
     { runManyState :: StateT s m a
     } deriving ( G.Generic
@@ -34,14 +37,12 @@ newtype ManyState m s a = ManyState
                , MonadIO
                )
 
-type instance PId (ManyState m) = Many '[]
-
-instance Monad m => PPointed (ManyState m) where
+instance Monad m => PPointed (ManyState m) (Many '[]) where
     ppure = ManyState . pure
 
--- | Given a ManyState that modifies @Many a@, and another ManyState that modifes @Many b@
--- make a State that accepts @Many (AppendUnique a b)@
--- with the compile time constraint that all the types in (AppendUnique a b) are distinct.
+instance Alternative m => PEmpty (ManyState m) (Many '[]) where
+    pempty = ManyState $ StateT $ \_ -> empty
+
 instance ( Monad m
          , Select a c
          , Select b c
@@ -57,9 +58,6 @@ instance ( Monad m
              (r, b) <- y (select c')
              let c'' = amend c' b
              pure (f r, c'')
-
-instance Alternative m => PEmpty (ManyState m) where
-    pempty = ManyState $ StateT $ \_ -> empty
 
 instance ( Monad m
          , Alternative m
@@ -97,28 +95,34 @@ instance ( Monad m
              let c'' = amend c' b
              pure (r', c'')
 
--- --------------------------------------------
+--------------------------------------------
 
--- newtype ChangingState m st a = ChangingState
---     { runChangingState :: At0 st -> m (a, At1 st)
---     } deriving ( G.Generic)
+-- | Given a ChangingState that changes state from @s@ to @t@,
+-- and another ChangingState that changes state from @t@ to @u@
+-- make a State that changes from @s@ to @u@
+-- with the compile time constraint that all the types in (AppendUnique a b) are distinct.
+newtype ChangingState m st a = ChangingState
+    { runChangingState :: At0 st -> m (a, At1 st)
+    } deriving ( G.Generic)
 
--- instance Functor m => Functor (ChangingState m st) where
---     fmap f m = ChangingState $ \s ->
---         fmap (\(a, s') -> (f a, s')) $ runChangingState m s
+instance Functor m => Functor (ChangingState m st) where
+    fmap f m = ChangingState $ \s ->
+        fmap (\(a, s') -> (f a, s')) $ runChangingState m s
 
--- type instance PId (ManyState m) = forall s. s
+instance Applicative m => PPointed (ChangingState m) (s, s) where
+    ppure a = ChangingState $ \s -> pure (a, s)
 
--- instance Applicative m => PPointed (ChangingState m) where
---     ppure a = ChangingState $ \s -> pure (a, s)
+instance Monad m => PApplicative (ChangingState m) (s, t) (t, u) (s, u) where
+    papply (ChangingState x) (ChangingState y) =
+        ChangingState $ \s -> do
+             (f, t) <- x s
+             (r, u) <- y t
+             pure (f r, u)
 
--- -- | Given a ChangingState that changes state from @s@ to @t@,
--- -- and another ChangingState that changes state from @t@ to @u@
--- -- make a State that changes from @s@ to @u@
--- -- with the compile time constraint that all the types in (AppendUnique a b) are distinct.
--- instance Applicative m => PApplicative (ManyState m) (s, t) (t, u) (s, u) where
---     papply (ManyState x) (ManyState y) =
---         ManyState $ \s -> do
---              (f, t) <- x s
---              (r, u) <- y t
---              pure (f r, u)
+instance Monad m => PMonad (ChangingState m) (s, t) (t, u) (s, u) where
+    pbind (ChangingState x) k =
+        ChangingState $ \s -> do
+             (r, t) <- x s
+             let ChangingState y = k r
+             (r', u) <- y t
+             pure (r', u)

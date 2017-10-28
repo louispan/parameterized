@@ -17,8 +17,8 @@ import Parameterized.TypeLevel
 import Parameterized.Data.Semigroup
 
 -- | Parameterized version of mempty in Monoid.
-class PMempty (n :: k -> Type) where
-    pmempty :: n (PId n)
+class PMempty (n :: k -> Type) (id :: k) where
+    pmempty :: n id
 
 -- | Parameterized version of Monoid.
-type PMonoid n t u v = (PMempty n, PSemigroup n t u v)
+type PMonoid n id t u v = (PMempty n id, PSemigroup n t u v)
