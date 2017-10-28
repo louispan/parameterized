@@ -1,7 +1,9 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -9,14 +11,31 @@
 module Parameterized.Control.Monad.Trans.Reader where
 
 import Control.Applicative
+import Control.Monad
+import qualified Control.Monad.Fail as Fail
+import Control.Monad.Fix
+import Control.Monad.IO.Class
 import Control.Monad.Trans.Reader
+import Control.Monad.Zip
 import Data.Diverse
-import Parameterized.Control.Applicative
+import qualified GHC.Generics as G
 import Parameterized.Control.Monad
 
 newtype OverlappingWhichReader m r a = OverlappingWhichReader
     { runOverlappingWhichReader :: ReaderT r m a
-    } deriving Functor
+    } deriving ( G.Generic
+               , Functor
+               , Applicative
+               , Monad
+               , Alternative
+               , MonadPlus
+               , MonadZip
+               , MonadFix
+               , Fail.MonadFail
+               , MonadIO
+               )
+
+type instance PId (OverlappingWhichReader m) = Which '[]
 
 instance Applicative m => PPointed (OverlappingWhichReader m) where
     ppure = OverlappingWhichReader . pure
@@ -45,7 +64,19 @@ instance ( Alternative m
 
 newtype DistinctWhichReader m r a = DistinctWhichReader
     { runDistinctWhichReader :: ReaderT r m a
-    } deriving Functor
+    } deriving ( G.Generic
+               , Functor
+               , Applicative
+               , Monad
+               , Alternative
+               , MonadPlus
+               , MonadZip
+               , MonadFix
+               , Fail.MonadFail
+               , MonadIO
+               )
+
+type instance PId (DistinctWhichReader m) = Which '[]
 
 instance Applicative m => PPointed (DistinctWhichReader m) where
     ppure = DistinctWhichReader . pure
@@ -71,7 +102,19 @@ instance ( Reinterpret b c
 
 newtype ManyReader m r a = ManyReader
     { runManyReader :: ReaderT r m a
-    } deriving Functor
+    } deriving ( G.Generic
+               , Functor
+               , Applicative
+               , Monad
+               , Alternative
+               , MonadPlus
+               , MonadZip
+               , MonadFix
+               , Fail.MonadFail
+               , MonadIO
+               )
+
+type instance PId (ManyReader m) = Many '[]
 
 instance Applicative m => PPointed (ManyReader m) where
     ppure = ManyReader . pure

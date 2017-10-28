@@ -23,6 +23,7 @@ library
                        Parameterized.Control.Applicative
                        Parameterized.Control.Monad
                        Parameterized.Control.Monad.Trans.Reader
+                       Parameterized.Control.Monad.Trans.State.Strict
   build-depends:       base >= 4.7 && < 5
                      , data-diverse >= 1.2.0.2
                      , transformers >= 0.5.2.0

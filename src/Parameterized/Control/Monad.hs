@@ -12,7 +12,6 @@ module Parameterized.Control.Monad
     , (&=<<)
     , (&>=>)
     , (&<=<)
-    , PMonadPlus
     ) where
 
 import Data.Kind
@@ -48,4 +47,7 @@ infixr 1 &>=>
 (&<=<) = flip (&>=>)
 infixr 1 &<=<
 
-type PMonadPlus m t u v = (PAlternative m t u v, PMonad m t u v)
+-- class (PAlternative m t u v, PMonad m t u v) => PMonadPlus m t u v
+
+-- class PMZero (m :: k -> Type -> Type) where
+--     pmezero :: m (PId m) a
