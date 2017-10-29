@@ -12,3 +12,4 @@ Parameterized/indexed monoids and monads using only a single parameter type vari
 * 0.2.0.0
   - Renamed Pempty to PEmpty.
   - Added injective functional dependencies to PEmpty, and PEmpty.
+  - TypeLevel is not exported by default
