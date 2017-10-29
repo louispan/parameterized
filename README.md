@@ -3,6 +3,8 @@
 
 Parameterized/indexed monoids and monads using only a single parameter type variable.
 
+Refer to [ReaderSpec.hs](https://github.com/louispan/parameterized/blob/master/test/Parameterized/Control/Monad/Trans/Reader/ReaderSpec.hs) and [StateSpec.hs](https://github.com/louispan/parameterized/blob/master/test/Parameterized/Control/Monad/Trans/State/Strict/StateSpec.hs) for example usages.
+
 # Changelog
 
 * 0.2.0.0

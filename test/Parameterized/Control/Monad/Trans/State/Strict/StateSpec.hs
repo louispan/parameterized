@@ -17,6 +17,10 @@ import Test.Hspec
 main :: IO ()
 main = hspec spec
 
+-- | NB. Normally you'd use @MaybeT (StateT s) r@ and not
+-- @StateT s Maybe r@ because the state is lost on failure (Nothing),
+-- but for the purposes of this test, I want test funtionality of @StateT s m@
+-- where m is an Alternative.
 manyIntMaybeState :: StateT (Many '[Int]) Maybe String
 manyIntMaybeState= do
     s <- get

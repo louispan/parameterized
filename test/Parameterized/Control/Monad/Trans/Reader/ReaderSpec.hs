@@ -224,7 +224,7 @@ spec = do
                         ManyReader manyBoolMaybeReader
                 -- the "parameter" is combined
                 r' = runManyReader r :: ReaderT (Many '[Int, Bool]) Maybe String
-            -- functionality of both readers in an Alternative fashion
+            -- functionality of both readers in an Applicative fashion
             runReaderT r' ( (5 :: Int) ./ True ./ nil) `shouldBe` Just "5.True"
             runReaderT r' ( (5 :: Int) ./ False ./ nil) `shouldBe` Nothing
             runReaderT r' ( (0 :: Int) ./ True ./ nil) `shouldBe` Nothing
@@ -238,7 +238,7 @@ spec = do
                             _ -> empty
                 -- the "parameter" is combined
                 r' = runManyReader r :: ReaderT (Many '[Int, Bool]) Maybe String
-            -- functionality of both readers in an Applicative fashion
+            -- functionality of both readers in an Monad fashion
             runReaderT r' ( (1 :: Int) ./ True ./ nil) `shouldBe` Just "True"
             runReaderT r' ( (1 :: Int) ./ False ./ nil) `shouldBe` Nothing
             runReaderT r' ( (5 :: Int) ./ True ./ nil) `shouldBe` Nothing
