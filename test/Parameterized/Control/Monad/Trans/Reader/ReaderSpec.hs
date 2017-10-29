@@ -75,11 +75,6 @@ whichIntBoolReader = do
     ay <- ask
     pure $ switch ay (CaseFunc @Show show)
 
-whichBoolStringReader :: Reader (Which '[Bool, String]) String
-whichBoolStringReader = do
-    ay <- ask
-    pure $ switch ay (CaseFunc @Show show)
-
 whichIntStringReader :: Reader (Which '[Int, String]) String
 whichIntStringReader = do
     ay <- ask
@@ -236,14 +231,14 @@ spec = do
             runReaderT r' ( (0 :: Int) ./ False ./ nil) `shouldBe` Nothing
 
 
-        it "it can 'pbind' to combine state runners 'Applicative'ly" $ do
+        it "it can 'pbind' to combine reader runners 'Monad'ically" $ do
             let r = ManyReader manyIntMaybeReader &>>= \a ->
                         case a of
                             "1" -> ManyReader manyBoolMaybeReader
                             _ -> empty
                 -- the "parameter" is combined
                 r' = runManyReader r :: ReaderT (Many '[Int, Bool]) Maybe String
-            -- functionality of both readers in an Alternative fashion
+            -- functionality of both readers in an Applicative fashion
             runReaderT r' ( (1 :: Int) ./ True ./ nil) `shouldBe` Just "True"
             runReaderT r' ( (1 :: Int) ./ False ./ nil) `shouldBe` Nothing
             runReaderT r' ( (5 :: Int) ./ True ./ nil) `shouldBe` Nothing

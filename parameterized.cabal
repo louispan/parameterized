@@ -35,7 +35,7 @@ test-suite parameterized-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       Parameterized.Control.Monad.Trans.Reader.ReaderSpec
-                       -- Parameterized.Control.Monad.Trans.State.Strict.StateSpec
+                       Parameterized.Control.Monad.Trans.State.Strict.StateSpec
   build-depends:       base
                      , parameterized
                      , hspec >= 2
