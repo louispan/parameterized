@@ -5,8 +5,7 @@
 {-# LANGUAGE PolyKinds #-}
 
 module Parameterized.Control.Applicative
-    ( module Parameterized.TypeLevel
-    , PPointed(..)
+    ( PPointed(..)
     , PApplicative(..)
     , (&<*>)
     , (&*>)
@@ -20,7 +19,6 @@ module Parameterized.Control.Applicative
     ) where
 
 import Data.Kind
-import Parameterized.TypeLevel
 
 -- | Parameterized version of 'pure' in 'Applicative'
 -- An instance of this should create a parameterized unary type

@@ -6,14 +6,12 @@
 {-# LANGUAGE PolyKinds #-}
 
 module Parameterized.Data.Monoid
-    ( module Parameterized.TypeLevel
-    , module Parameterized.Data.Semigroup
+    ( module Parameterized.Data.Semigroup
     , PMEmpty(..)
     , PMonoid
     ) where
 
 import Data.Kind
-import Parameterized.TypeLevel
 import Parameterized.Data.Semigroup
 
 -- | Parameterized version of mempty in Monoid.

@@ -20,6 +20,7 @@ import Control.Monad.Trans.State.Strict
 import Data.Diverse
 import qualified GHC.Generics as G
 import Parameterized.Control.Monad
+import Parameterized.TypeLevel
 
 -- | Given a ManyState that modifies @Many a@, and another ManyState that modifes @Many b@
 -- make a State that accepts @Many (AppendUnique a b)@

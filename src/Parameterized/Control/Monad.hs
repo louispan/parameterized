@@ -15,7 +15,6 @@ module Parameterized.Control.Monad
     ) where
 
 import Data.Kind
-import Parameterized.TypeLevel
 import Parameterized.Control.Applicative
 
 -- | Parameterized version of Monad.
