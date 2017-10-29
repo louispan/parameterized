@@ -8,7 +8,7 @@
 module Parameterized.Data.Monoid
     ( module Parameterized.TypeLevel
     , module Parameterized.Data.Semigroup
-    , PMempty(..)
+    , PMEmpty(..)
     , PMonoid
     ) where
 
@@ -17,8 +17,8 @@ import Parameterized.TypeLevel
 import Parameterized.Data.Semigroup
 
 -- | Parameterized version of mempty in Monoid.
-class PMempty (n :: k -> Type) (id :: k) where
+class PMEmpty (n :: k -> Type) (id :: k) | n -> id where
     pmempty :: n id
 
 -- | Parameterized version of Monoid.
-type PMonoid n id t u v = (PMempty n id, PSemigroup n t u v)
+type PMonoid n id t u v = (PMEmpty n id, PSemigroup n t u v)

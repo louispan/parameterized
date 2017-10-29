@@ -63,6 +63,10 @@ instance ( Alternative m
 -- | Given a Reader that accepts @Which a@, and another Reader that accepts @Which b@
 -- make a reader that accepts @Which (Append a b)@ and only run one of the readers for the correct Which type,
 -- with a compile-time contraint that the types in @Which a@ are distinct from the type in @Which b@
+-- The advantage of 'DistinctWhichReader' over 'OverlappingWhichReader' is that 'pappend' doesn't
+-- require the inner monad @m@ to be an 'Alternative'.
+-- NB. 'PEmpty' still requires 'Alternative' but you don't need to be an instance of 'PEmpty'
+-- (analogous to Semigroup)
 newtype DistinctWhichReader m r a = DistinctWhichReader
     { runDistinctWhichReader :: ReaderT r m a
     } deriving ( G.Generic

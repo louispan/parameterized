@@ -71,7 +71,7 @@ pliftA3 f a b c = pliftA2 f a b &<*> c
 -- | Parameterized version of empty in 'Alternative'.
 -- An instance of this should create a parameterized unary type
 -- where the parameter is an identity in respect to 'pappend'
-class PEmpty (m :: k -> Type -> Type) (id :: k) where
+class PEmpty (m :: k -> Type -> Type) (id :: k) | m -> id where
     -- | The identity of '&<|>'
     pempty :: m id a
 
