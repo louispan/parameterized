@@ -19,3 +19,4 @@ class PSemigroup (n :: k -> Type) (t :: k) (u :: k) (v :: k) | t u -> v where
 (&<>) :: (PSemigroup n t u v) => n t -> n u -> n v
 (&<>) = pmappend
 infixr 6 &<>
+infixr 6 `pmappend`

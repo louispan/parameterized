@@ -39,6 +39,7 @@ class (Functor (m t), Functor (m u), Functor (m v)) =>
 (&<*>) :: (PApplicative m t u v) => m t (a -> b) -> m u a -> m v b
 (&<*>) = papply
 infixl 4 &<*>
+infixl 4 `papply`
 
 -- | Sequence actions, discarding the value of the first argument.
 (&*>) :: (PApplicative m t u v) => m t a -> m u b -> m v b
@@ -48,7 +49,7 @@ infixl 4 &<*
 -- | Sequence actions, discarding the value of the second argument.
 (&<*) :: (PApplicative m t u v) => m t a -> m u b -> m v a
 (&<*) = pliftA2 const
-infixl 4 &*> -- , &<**>
+infixl 4 &*>
 
 -- | Lift a function to actions.
 pliftA :: (Functor (m t)) => (a -> b) -> m t a -> m t b
@@ -84,3 +85,4 @@ class PAlternative (m :: k -> Type -> Type) (t :: k) (u :: k) (v :: k) | t u -> 
 (&<|>) :: (PAlternative m t u v) => m t a -> m u a -> m v a
 (&<|>) = pappend
 infixl 3 &<|>
+infixl 3 `pappend`

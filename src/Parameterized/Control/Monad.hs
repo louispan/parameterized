@@ -26,6 +26,7 @@ class PApplicative m t u v => PMonad (m :: k -> Type -> Type) (t :: k) (u :: k) 
 (&>>=) :: PMonad m t u v => m t a -> (a -> m u b) -> m v b
 (&>>=) = pbind
 infixl 1 &>>=
+infixl 1 `pbind`
 
 (&>>) :: PMonad m t u v => m t a -> m u b -> m v b
 m &>> k = m &>>= \_ -> k

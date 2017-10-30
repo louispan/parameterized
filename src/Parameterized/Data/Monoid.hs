@@ -1,5 +1,6 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -19,4 +20,5 @@ class PMEmpty (n :: k -> Type) (id :: k) | n -> id where
     pmempty :: n id
 
 -- | Parameterized version of Monoid.
-type PMonoid n id t u v = (PMEmpty n id, PSemigroup n t u v)
+class (PSemigroup n t u v, PMEmpty n id) => PMonoid n id t u v
+instance (PSemigroup n t u v, PMEmpty n id) => PMonoid n id t u v

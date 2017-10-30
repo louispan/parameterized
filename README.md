@@ -7,6 +7,10 @@ Refer to [ReaderSpec.hs](https://github.com/louispan/parameterized/blob/master/t
 
 # Changelog
 
+* 0.3.0.0
+  - PMonoid is now a class with a single instance (courtesy of georgew).
+  - added fixities for backtick versions of pmappend, pappend, papply and pbind
+
 * 0.2.0.0
   - Renamed Pempty to PEmpty.
   - Added injective functional dependencies to PMEmpty, and PEmpty.
