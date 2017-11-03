@@ -23,6 +23,10 @@ import Data.Kind
 -- | Parameterized version of 'pure' in 'Applicative'
 -- An instance of this should create a parameterized unary type
 -- where the parameter is an identity in respect to 'papply'
+-- NB. For 'Parameterized.Control.Monad.Trans.State.Strict.ChangingState',
+-- the id @s@ "parameter" cannot be purely determined from @m@,
+-- so unlike 'pappend' there is not functional dependency to help type inference.
+-- Hint: use @ppure \@_ \@_ @id@ to specify the id type to avoid ambiguity.
 class PPointed (m :: k -> Type -> Type) (id :: k) where
     -- | lift a value.
     ppure :: a -> m id a
@@ -44,12 +48,12 @@ infixl 4 `papply`
 -- | Sequence actions, discarding the value of the first argument.
 (&*>) :: (PApplicative m t u v) => m t a -> m u b -> m v b
 a1 &*> a2 = (id <$ a1) &<*> a2
-infixl 4 &<*
+infixl 4 &*>
 
 -- | Sequence actions, discarding the value of the second argument.
 (&<*) :: (PApplicative m t u v) => m t a -> m u b -> m v a
 (&<*) = pliftA2 const
-infixl 4 &*>
+infixl 4 &<*
 
 -- | Lift a function to actions.
 pliftA :: (Functor (m t)) => (a -> b) -> m t a -> m t b

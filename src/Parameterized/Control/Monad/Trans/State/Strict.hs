@@ -102,9 +102,15 @@ instance ( Monad m
 -- and another ChangingState that changes state from @t@ to @u@
 -- make a State that changes from @s@ to @u@
 -- with the compile time constraint that all the types in (AppendUnique a b) are distinct.
+-- NB. The state is in the snd position to be consistent with StateT.
 newtype ChangingState m st a = ChangingState
     { runChangingState :: At0 st -> m (a, At1 st)
-    } deriving ( G.Generic)
+    } deriving (G.Generic)
+
+-- | Prefer this to using ChangingState to construct as it results in better type inference
+-- as it avoids ambiguous type variable @st@
+changingState :: (s -> m (a, t)) -> ChangingState m (s, t) a
+changingState = ChangingState
 
 instance Functor m => Functor (ChangingState m st) where
     fmap f m = ChangingState $ \s ->

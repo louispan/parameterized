@@ -8,7 +8,9 @@ import Control.Monad.Trans.State.Strict
 import Parameterized.Control.Monad.Trans.State.Strict
 import Parameterized.Control.Monad
 import Data.Diverse
+import Data.Functor.Identity
 import Data.Semigroup
+import Text.Read (readMaybe)
 import Test.Hspec
 
 
@@ -40,6 +42,16 @@ manyBoolMaybeState = do
         r' -> do
             put $ replace @Bool s False
             pure $ show r'
+
+--------------------------------
+
+intToString :: Int -> Identity (Bool, String)
+intToString i = Identity (even i, show i)
+
+stringToBool :: String -> Identity (Int, Bool)
+stringToBool s = case readMaybe s of
+    Nothing -> Identity (0, False)
+    Just i -> Identity (i, True)
 
 --------------------------------
 
@@ -76,7 +88,7 @@ spec = do
                         ManyState manyBoolMaybeState
                 -- the "parameter" is combined
                 r' = runManyState r :: StateT (Many '[Int, Bool]) Maybe String
-            -- functionality of both readers in an Applicative fashion
+            -- functionality of both state functions in an Applicative fashion
             runStateT r' ( (5 :: Int) ./ True ./ nil) `shouldBe` Just ("5.True", (6 :: Int) ./ False ./ nil)
             runStateT r' ( (5 :: Int) ./ False ./ nil) `shouldBe` Nothing
             runStateT r' ( (0 :: Int) ./ True ./ nil) `shouldBe` Nothing
@@ -90,10 +102,38 @@ spec = do
                             _ -> empty
                 -- the "parameter" is combined
                 r' = runManyState r :: StateT (Many '[Int, Bool]) Maybe String
-            -- functionality of both readers in an Monad fashion
+            -- functionality of both state functions in an Monad fashion
             runStateT r' ( (1 :: Int) ./ True ./ nil) `shouldBe` Just ("True", (2 :: Int) ./ False ./ nil)
             runStateT r' ( (1 :: Int) ./ False ./ nil) `shouldBe` Nothing
             runStateT r' ( (5 :: Int) ./ True ./ nil) `shouldBe` Nothing
             runStateT r' ( (5 :: Int) ./ False ./ nil) `shouldBe` Nothing
             runStateT r' ( (0 :: Int) ./ True ./ nil) `shouldBe` Nothing
             runStateT r' ( (0 :: Int) ./ False ./ nil) `shouldBe` Nothing
+
+    describe "ChangingState" $ do
+        it "ppure id doesn't change the type of the parameter" $ do
+            let r1 = (ppure @_ @_ @(Int, Int) id) &<*> changingState intToString
+                -- the "parameter" doesn't change
+                r1' = r1 :: ChangingState Identity (Int, String) Bool
+            -- functionality unchanged
+            runChangingState r1' (5 :: Int) `shouldBe` Identity (False, "5")
+            runChangingState r1' (10 :: Int) `shouldBe` Identity (True, "10")
+
+        it "it can 'papply' to combine state runners 'Applicative'ly" $ do
+            let r = (\b i -> show b <> "." <> show i) <$> changingState intToString &<*>
+                        changingState stringToBool
+                -- the "parameter" is combined
+                r' = r :: ChangingState Identity (Int, Bool) String
+            -- functionality of both state functions in an Applicative fashion
+            runChangingState r' (5 :: Int) `shouldBe` Identity ("False.5", True)
+            runChangingState r' (10 :: Int) `shouldBe` Identity ("True.10", True)
+
+        it "it can 'pbind' to combine state runners 'Monad'ically" $ do
+            let r = changingState intToString &>>= \b ->
+                    changingState stringToBool &>>= \i ->
+                    ppure @_ @_ @(Bool, Bool) (show b <> "." <> show i)
+                -- the "parameter" is combined
+                r' = r :: ChangingState Identity (Int, Bool) String
+            -- functionality of both state functions in an Applicative fashion
+            runChangingState r' (5 :: Int) `shouldBe` Identity ("False.5", True)
+            runChangingState r' (10 :: Int) `shouldBe` Identity ("True.10", True)

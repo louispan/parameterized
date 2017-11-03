@@ -10,6 +10,7 @@ Refer to [ReaderSpec.hs](https://github.com/louispan/parameterized/blob/master/t
 * 0.3.0.0
   - PMonoid is now a class with a single instance (courtesy of georgew).
   - added fixities for backtick versions of pmappend, pappend, papply and pbind
+  - added changingState constructor which results in better type inference.
 
 * 0.2.0.0
   - Renamed Pempty to PEmpty.
