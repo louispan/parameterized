@@ -1,5 +1,5 @@
 name:                parameterized
-version:             0.2.0.0
+version:             0.3.0.0
 synopsis:            Extensible records and polymorphic variants.
 description:         Parameterized/indexed monoids and monads using only a single parameter type variable.
 
