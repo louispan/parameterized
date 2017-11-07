@@ -39,6 +39,8 @@ newtype OverlappingWhichReader m r a = OverlappingWhichReader
                , MonadIO
                )
 
+type instance PUnary (OverlappingWhichReader m) r = OverlappingWhichReader m r
+
 instance Applicative m => PPointed (OverlappingWhichReader m) (Which '[]) where
     ppure = OverlappingWhichReader . pure
 
@@ -81,6 +83,8 @@ newtype DistinctWhichReader m r a = DistinctWhichReader
                , MonadIO
                )
 
+type instance PUnary (DistinctWhichReader m) r = DistinctWhichReader m r
+
 instance Applicative m => PPointed (DistinctWhichReader m) (Which '[]) where
     ppure = DistinctWhichReader . pure
 
@@ -117,6 +121,8 @@ newtype ManyReader m r a = ManyReader
                , MonadIO
                )
 
+type instance PUnary (ManyReader m) r = ManyReader m r
+
 instance Applicative m => PPointed (ManyReader m) (Many '[]) where
     ppure = ManyReader . pure
 
@@ -133,8 +139,7 @@ instance ( Functor (ManyReader m (Many c))
     papply (ManyReader (ReaderT f)) (ManyReader (ReaderT g)) =
         ManyReader . ReaderT $ \c -> f (select c) <*> g (select c)
 
-instance ( Functor (ManyReader m (Many c))
-         , Alternative m
+instance ( Alternative m
          , Select a c
          , Select b c
          , c ~ AppendUnique a b

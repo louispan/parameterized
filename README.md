@@ -7,6 +7,9 @@ Refer to [ReaderSpec.hs](https://github.com/louispan/parameterized/blob/master/t
 
 # Changelog
 
+* 0.4.0.0
+  - Added PNullary and PUnary injective type families.
+
 * 0.3.0.0
   - PMonoid is now a class with a single instance (courtesy of georgew).
   - added fixities for backtick versions of pmappend, pappend, papply and pbind

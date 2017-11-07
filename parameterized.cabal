@@ -1,6 +1,6 @@
 name:                parameterized
-version:             0.3.0.0
-synopsis:            Extensible records and polymorphic variants.
+version:             0.4.0.0
+synopsis:            Parameterized/indexed monoids and monads using only a single parameter type variable.
 description:         Parameterized/indexed monoids and monads using only a single parameter type variable.
 
 homepage:            https://github.com/louispan/parameterized#readme

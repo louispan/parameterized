@@ -38,6 +38,8 @@ newtype ManyState m s a = ManyState
                , MonadIO
                )
 
+type instance PUnary (ManyState m) s = ManyState m s
+
 instance Monad m => PPointed (ManyState m) (Many '[]) where
     ppure = ManyState . pure
 
@@ -111,6 +113,8 @@ newtype ChangingState m st a = ChangingState
 -- as it avoids ambiguous type variable @st@
 changingState :: (s -> m (a, t)) -> ChangingState m (s, t) a
 changingState = ChangingState
+
+type instance PUnary (ChangingState m) st = ChangingState m st
 
 instance Functor m => Functor (ChangingState m st) where
     fmap f m = ChangingState $ \s ->
