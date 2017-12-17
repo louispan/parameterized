@@ -7,6 +7,9 @@ Refer to [ReaderSpec.hs](https://github.com/louispan/parameterized/blob/master/t
 
 # Changelog
 
+* 0.5.0.0
+  - Support data-diverse-2.0.0.0.
+
 * 0.4.0.0
   - Added PNullary and PUnary injective type families.
 

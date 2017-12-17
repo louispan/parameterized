@@ -49,25 +49,25 @@ instance Alternative m => PEmpty (ManyState m) (Many '[]) where
 instance ( Monad m
          , Select a c
          , Select b c
-         , Amend a c
-         , Amend b c
+         , Amend' a c
+         , Amend' b c
          , c ~ AppendUnique a b
          ) =>
          PApplicative (ManyState m) (Many a) (Many b) (Many c) where
     papply (ManyState (StateT x)) (ManyState (StateT y)) =
         ManyState . StateT $ \c -> do
              (f, a) <- x (select c)
-             let c' = amend c a
+             let c' = amend' c a
              (r, b) <- y (select c')
-             let c'' = amend c' b
+             let c'' = amend' c' b
              pure (f r, c'')
 
 instance ( Monad m
          , Alternative m
          , Select a c
          , Select b c
-         , Amend a c
-         , Amend b c
+         , Amend' a c
+         , Amend' b c
          , c ~ AppendUnique a b
          ) =>
          PAlternative (ManyState m) (Many a) (Many b) (Many c) where
@@ -76,26 +76,26 @@ instance ( Monad m
       where
         x' c = do
             (r, a) <- x (select c)
-            pure (r, amend c a)
+            pure (r, amend' c a)
         y' c = do
             (r, b) <- y (select c)
-            pure (r, amend c b)
+            pure (r, amend' c b)
 
 instance ( Monad m
          , Select a c
          , Select b c
-         , Amend a c
-         , Amend b c
+         , Amend' a c
+         , Amend' b c
          , c ~ AppendUnique a b
          ) =>
          PMonad (ManyState m) (Many a) (Many b) (Many c) where
     pbind (ManyState (StateT x)) k =
         ManyState . StateT $ \c -> do
              (r, a) <- x (select c)
-             let c' = amend c a
+             let c' = amend' c a
                  ManyState (StateT y) = k r
              (r', b) <- y (select c')
-             let c'' = amend c' b
+             let c'' = amend' c' b
              pure (r', c'')
 
 --------------------------------------------
