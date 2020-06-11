@@ -91,7 +91,7 @@ whichIntBoolStringReader = do
 manyIntMaybeReader :: ReaderT (Many '[Int]) Maybe String
 manyIntMaybeReader = do
     a <- ask
-    let r = fetch @Int a
+    let r = grab @Int a
     case r of
         0 -> empty
         r' -> pure $ show r'
@@ -99,7 +99,7 @@ manyIntMaybeReader = do
 manyBoolMaybeReader :: ReaderT (Many '[Bool]) Maybe String
 manyBoolMaybeReader = do
     a <- ask
-    let r = fetch @Bool a
+    let r = grab @Bool a
     case r of
         False -> empty
         r' -> pure $ show r'
