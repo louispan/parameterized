@@ -26,7 +26,7 @@ main = hspec spec
 manyIntMaybeState :: StateT (Many '[Int]) Maybe String
 manyIntMaybeState= do
     s <- get
-    let r = fetch @Int s
+    let r = grab @Int s
     case r of
         0 -> empty
         r' -> do
@@ -36,7 +36,7 @@ manyIntMaybeState= do
 manyBoolMaybeState :: StateT (Many '[Bool]) Maybe String
 manyBoolMaybeState = do
     s <- get
-    let r = fetch @Bool s
+    let r = grab @Bool s
     case r of
         False -> empty
         r' -> do
